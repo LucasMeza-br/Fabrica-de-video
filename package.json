@@ -1,0 +1,20 @@
+{
+  "name": "fabrica-de-video",
+  "version": "1.0.0",
+  "description": "Construir Videos por robôs",
+  "homepage": "https://github.com/LucasMeza-br/Fabrica-de-video#readme",
+  "bugs": {
+    "url": "https://github.com/LucasMeza-br/Fabrica-de-video/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/LucasMeza-br/Fabrica-de-video.git"
+  },
+  "license": "ISC",
+  "author": "",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  }
+}
