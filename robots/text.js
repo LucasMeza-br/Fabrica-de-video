@@ -1,0 +1,176 @@
+const axios = require('axios');
+const sentenceBoundaryDetection = require('sbd');
+
+module.exports = async function robot(content) {
+	console.log('Conteúdo recebido na função robot:', content)
+
+  if (!content || typeof content !== 'object') {
+    console.error('❌ Conteúdo inválido! Deve ser um objeto com propriedade searchTerm.')
+    return
+  }
+	await fetchContentFrom(content)
+	sanitizeContent(content)
+	breakContentIntoSentences(content)
+	
+	async function fetchContentFrom(content) {
+		const searchTerm = content.searchTerm
+		
+
+		console.log('Termo de busca:', searchTerm)
+
+  	if (!searchTerm || typeof searchTerm !== 'string' || searchTerm.trim() === '') {
+    	console.error('❌ Termo de busca inválido!')
+    	return
+	}
+
+		const url = 'https://pt.wikipedia.org/w/api.php'
+		const params = {
+			action: 'query',
+			list: 'search',
+			srsearch: searchTerm,
+			format: 'json'
+						
+			}
+
+		try{
+			console.log ('Enviando requisição para Wikipedia (search)')
+			const response = await axios.get(url, { params })
+			
+			if (!response.data.query || !response.data.query.search){
+				console.log ('Nenhum resultado encontrado. ')
+				return
+			}
+
+			const resultados = response.data.query.search
+
+			if (resultados.length === 0) {
+				console.log('Nenhum resultado encontrado.')
+				return
+			}
+				console.log('Resultados:')
+				resultados.forEach((r,i) => {
+				console.log(`${i + 1}. ${r.title}`)
+			})
+		
+				const primeiroTitulo = resultados[0].title
+
+				await fetchContentFromwikipedia(primeiroTitulo)
+			}
+
+		catch (error) {
+			console.error('Erro o buscar:', error.message)
+		}
+	}
+
+	async function 	fetchContentFromwikipedia(titulo) {
+		const url = 'https://pt.wikipedia.org/w/api.php'
+		const params = {
+			action: 'query',
+			prop: 'revisions',
+			titles: titulo,
+			rvslots: 'main',
+			rvprop: 'content',
+			format: 'json',
+			formatversion: 2,
+			piprop: 'thumbnail',
+			pithumbsize: 800,
+			redirects: 1,
+		};
+
+  		try {
+			console.log('\n Buscando conteúdo completo (wikitext)...');
+    			const response = await axios.get(url, {params });
+
+			
+			const pages = response.data?.query?.pages;
+			if (!pages || pages.length ===0 || !pages[0].revisions){
+				console.log('Nenhum conteúdo encontrado no wikitext.');
+				return;
+			}
+
+			const wikitext = pages[0].revisions[0].slots.main.content;
+
+			content.rawWikipedia = wikitext
+			content.sourceContentOriginal = wikitext
+			
+	
+			console.log(`\n${content.prefix || ''} ${content.searchTerm}?`);
+			console.log('\n Conteúdo Wikitext: \n');
+			console.log(wikitext);
+			return true
+
+		}
+		catch (error) {
+			console.error('Erro ao buscar wikitexto:', error.message)
+			return false
+		}
+		
+	}
+	function sanitizeContent(content){
+		const withoutBlankLinesAndMarkdown = removeBlankLinesAndMarkdown(content.sourceContentOriginal)
+		const withoutDatesInParentheses = removeDatesInParentheses(withoutBlankLinesAndMarkdown)
+		
+		content.sourceContentSanitized = withoutDatesInParentheses;
+		console.log('Conteúdo limpo:', content.sourceContentSanitized);
+		
+		function removeBlankLinesAndMarkdown(text){
+			const allLines = text.split('\n')
+			
+			const withoutBlankLinesAndMarkdown = allLines.filter((line) => {
+				if (line.trim().length === 0 || line.trim().startsWith('=')) {
+					return false
+				}
+			return true
+		})
+		return withoutBlankLinesAndMarkdown.join(' ')
+		}
+		function removeDatesInParentheses(text) {
+
+		// Remove parênteses aninhados
+  		let newText = text.replace(/\((?:\([^()]*\)|[^()])*\)/gm, '')
+
+  		// Remove templates aninhados
+  		let templateRegex = /\{\{[^{}]*\}\}/g
+  		while (templateRegex.test(newText)) {
+    		newText = newText.replace(templateRegex, '')
+  		}
+			return newText
+				//.replace(/\((?:\([^()]*\)|[^()])*\)/gm, '') // Remove conteúdo entre parênteses aninhados
+      				.replace(/={2,}.*?={2,}/g, '')               // Remove títulos (==Título==)
+      				.replace(/\[\[(?:[^|\]]*\|)?([^\]]+)\]\]/g, '$1') // Remove links wiki mantendo texto
+      				.replace(/<ref[^>]*>.*?<\/ref>/gs, '')       // Remove referências <ref>...</ref>
+      				.replace(/<[^>]+>/g, '')                       // Remove tags HTML
+      				.replace(/\{\{[^}]*\}\}/g, '')                 // Remove templates {{...}}
+      				.replace(/\[\[Imagem:[^\]]+\]\]/gi, '')        // Remove imagens
+     			 	.replace(/\[https?:\/\/[^\s]+\]/g, '')         // Remove links externos
+      				.replace(/'''/g, '')                            // Remove negrito wiki
+      				.replace(/''/g, '')                             // Remove itálico wiki
+      				.replace(/\n+/g, '\n')                          // Normaliza quebras de linha
+      				.replace(/miniatura\|upright\|.*?:\./gi, '')
+				.replace(/\[\[.*?\]\]/gs, '')
+				.trim()
+		
+		}
+	}
+	function breakContentIntoSentences(content) {
+		console.log('Entrou na função breakContentIntoSentences')
+		console.log('Antes da quebra:', content.sourceContentSanitized)
+		content.sentences = []
+
+		try{
+		const sentences = sentenceBoundaryDetection.sentences(content.sourceContentSanitized)
+		sentences.forEach((sentence) => {
+		content.sentences.push ({
+			text: sentence,
+			keywords: [],
+			images: []
+		})
+		})	
+		console.log('Sentenças detectadas:', sentences)
+		}	
+		catch (error){
+			console.error('Erro ao quebrar sentenças:', error)
+		}
+		}		
+	}	
+
