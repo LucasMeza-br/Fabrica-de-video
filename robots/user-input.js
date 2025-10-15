@@ -1,9 +1,13 @@
 const readline = require('readline-sync')
+const state = require('./state.js')
 function userInput(){
-	const content = {}
+	const content = {
+	maximumSentences: 7
+	}
 
 	content.searchTerm = askAndReturnSearchTerm()
 	content.prefix = askAndReturnPrefix()
+	state.save(content)
 
 	function askAndReturnSearchTerm() {
 		return readline.question('Type a Wikipedia search term: ')
@@ -15,7 +19,7 @@ function userInput(){
 
 		return selectedPrefixText
 	}
-	console.log(content)
-	return content
+	
+	
 }	
 module.exports = userInput

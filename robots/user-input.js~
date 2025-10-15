@@ -1,6 +1,8 @@
 const readline = require('readline-sync')
 function userInput(){
-	const content = {}
+	const content = {
+	maximumSentences: 7
+	}
 
 	content.searchTerm = askAndReturnSearchTerm()
 	content.prefix = askAndReturnPrefix()
@@ -15,7 +17,7 @@ function userInput(){
 
 		return selectedPrefixText
 	}
-	console.log(content)
-	return content
+	
+	
 }	
 module.exports = userInput

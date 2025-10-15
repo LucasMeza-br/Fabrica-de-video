@@ -13,25 +13,22 @@
    serviceUrl: url,
   
   });
+ 
+const state = require('./state.js')
+  module.exports = async function robot() {
   
-  module.exports = async function robot(content) {
-  	console.log('Conteúdo recebido na função robot:', content)
-  
-    if (!content || typeof content !== 'object') {
-      console.error('❌ Conteúdo inválido! Deve ser um objeto com propriedade searchTerm.')
-      return
-    }
+	const content = state.load()
+	  
   	await fetchContentFrom(content)
   	sanitizeContent(content)
   	breakContentIntoSentences(content)
   	console.log('🔍 Antes de limitar:', content.sentences.length, 'sentenças')
   
 	limitMaximumSentences(content)
-  	console.log('✅ Depois de limitar:', content.sentences.length, 'sentenças')
- // 	limitMaximumSentences(content)
+
   	await fetchKeywordsOfAllSentences(content)
-	  console.log('saiu da função fetchKeywordsOfAllSentences')
-  	
+
+  	state.save(content)
   
   	async function fetchContentFrom(content) {
   		const searchTerm = content.searchTerm
