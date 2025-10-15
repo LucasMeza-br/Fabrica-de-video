@@ -26,12 +26,14 @@
   	breakContentIntoSentences(content)
   	console.log('🔍 Antes de limitar:', content.sentences.length, 'sentenças')
   
-	limitMaximumSentences(content)
+  	limitMaximumSentences(content)
   	console.log('✅ Depois de limitar:', content.sentences.length, 'sentenças')
- // 	limitMaximumSentences(content)
+  	limitMaximumSentences(content)
+  	try {
   	await fetchKeywordsOfAllSentences(content)
-	  console.log('saiu da função fetchKeywordsOfAllSentences')
-  	
+  	} catch (error) {
+  		console.error('Erro ao buscar palavras-chave do watson:', error.message || error)
+  		}
   
   	async function fetchContentFrom(content) {
   		const searchTerm = content.searchTerm
@@ -178,7 +180,7 @@
   		console.log('Antes da quebra:', content.sourceContentSanitized)
   		content.sentences = []
   
-  		
+  		try{
   		const sentences = sentenceBoundaryDetection.sentences(content.sourceContentSanitized)
   		sentences.forEach((sentence) => {
   		content.sentences.push ({
@@ -189,115 +191,59 @@
   		})	
   		console.log('Sentenças detectadas:', sentences)
   		}	
-  		
+  		catch (error){
+  			console.error('Erro ao quebrar sentenças:', error)
+  		}
+  		}
   
-  		function limitMaximumSentences(content){
-  		content.sentences = content.sentences.slice(0, content.maximumSentences)
- 		 }
-//		async function fetchKeywordsOfAllSentences(content){
-//		   for (const sentence of content.sentences) {
-//			   try{
-//				    if(!sentence.text || typeof sentence.text !== 'string') continue;
-//
-//			sentence.keywords = await fetchWatsonAndReturnKeywords(sentence.text)
-//			  		sentence.keywords = Array.isArray(keywords) ? keywords : [];
-//					    console.log (`keywords extraídas para: "${sentence.text}"`);
-//					    
-//
-//			   }catch (error) {
-//					console.error(`Erro ao processar sentença: "${sentence.text}"`,error.message || error);
-//				sentence.keywords = [];
-//			   }
-//			   }
-//		}
-//			   sentence.keywords = await fetchWatsonAndReturnKeywords(sentence.text)
+  //function limitMaximumSentences(content){
+  //	content.sentences = content.sentences.slice(0, content.maximumSentences)
+ // }
+// 
+//  async function fetchKeywordsOfAllSentences(content){
+//   for (const sentence of content.sentences) {
+//  	//sentence.keywords = await fetchWatsonAndReturnKeywords(sentence.text)
+//  try {
+//        sentence.keywords = await fetchWatsonAndReturnKeywords(sentence.text)
 //        console.log(`🔑 Keywords extraídas para: "${sentence.text}"`)
 //      } catch (error) {
 //        console.error(`Erro ao processar sentença: "${sentence.text}"`, error.message || error)
 //        sentence.keywords = []
-      
+//      }
 //   }
 //  
 //  }
-//
-//
-
-async function fetchKeywordsOfAllSentences(content) {
-  for (const sentence of content.sentences) {
-    try {
-      const keywords = await fetchWatsonAndReturnKeywords(sentence.text);
-      sentence.keywords = keywords;
-      console.log(`🔑 Keywords extraídas para: "${sentence.text}" ->`, keywords);
-    } catch (error) {
-      console.error(`❌ Erro ao processar sentença: "${sentence.text}"`, error.message || error);
-      sentence.keywords = [];
-    }
-  }
-}
-//
-//		async function fetchWatsonAndReturnKeywords(sentence) {
-//	 	const watsonPromise = new Promise((resolve, reject) => {
-//    		nlu.analyze({
-//   			text: sentence,
+//  
+//  async function fetchWatsonAndReturnKeywords(text) {
+//  	return new Promise((resolve, reject) => {
+//  //	try {
+//  		nlu.analyze(
+//  			{
+//    			text: text,//sentence,
 //    			features: {
-//      				keywords: {}
-//    			}
-// 			}, 
-//			(error, response) => {		
-////  	
-//  	  if (error) {
-// 		  reject (error)
-//		  return
-//		  //  		  return reject(new Error(`Erro ao buscar keywords do Watson: ${err.message}`));
+//      				keywords: {},
+//    			},
+//  			},		
+//  	(err, response) => {
+//  	  if (err) {
+//  		  return reject(new Error(`Erro ao buscar keywords do Watson: ${err.message}`));
 //  	 }
-//
-//  		
-//  		const keywords = response.keywords.map((keyword) => {
-//  		return keyword.text
-//		});
-// 		resolve(keywords)
-////  			 catch (e)
-////  				reject( new Error(`Erro ao buscar keywords do Watson`))
-//// 
-//		}	
-//		)
-//		})
-//		const timeoutPromise = new Promise((_, reject) =>
-//			setTimeout(() => reject(new Error('Timeout na chamada do Watson')), 10000)
-//		)
-//			return Promise.race([watsonPromise, timeoutPromise])
-//
-////  		console.log('Fim da função robot', content.sentences ? content.sentenes.length : 'Sem sentenças');
-////  
-//// 		return content;
+//  
+//  		try {
+//  		const keywords = response.result.keywords.map(keyword => keyword.text);
+//  		//return keywords//.text
+//  		resolve(keywords);
+//  			} catch (e){
+//  				reject( new Error(`Erro ao buscar keywords do Watson`))
+//  			}
+//  			}	
+//  		);
+//  	});
 //  }
-		
-async function fetchWatsonAndReturnKeywords(sentence) {
-  try {
-    const response = await nlu.analyze({
-      text: sentence,
-      features: {
-        keywords: {
-          limit: 5
-        }
-      }
-    });
-
-    if (!response.result.keywords || !Array.isArray(response.result.keywords)) {
-      return [];
-    }
-
-    return response.result.keywords.map(k => k.text);
-  } catch (error) {
-    console.error('❌ Erro no Watson:', error.message || error);
-    return [];
+//  		console.log('Fim da função robot', content.sentences ? content.sentenes.length : 'Sem sentenças');
+//  
+//  		return content;
   }
-}
-
-
-
-}
-
 //
 //
 //

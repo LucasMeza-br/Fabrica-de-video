@@ -19,7 +19,9 @@
   },
   "dependencies": {
     "algorithmia": "^0.3.10",
-    "axios": "^1.12.2",
+    "axios": "^1.4.0",
+    "ibm-cloud-sdk-core": "^5.4.3",
+    "ibm-watson": "^12.0.1",
     "readline-sync": "^1.4.10",
     "sbd": "^1.0.19",
     "wikijs": "^6.4.1"
