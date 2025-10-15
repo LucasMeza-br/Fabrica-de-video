@@ -1,16 +1,19 @@
 const readline = require('readline-sync')
 const robots = {
 	userInput: require('./robots/user-input.js'),
-	text: require('./robots/text.js')
+	text: require('./robots/text.js'),
+	state: require('./robots/state.js')
 }
 
 async function start() {
 	
-	let content = robots.userInput()
-	content.maximumSentences = 7
-	console.log('Conteúdo inicial:', content)
-	await	robots.text(content)
-	console.log(JSON.stringify(content, null, 4))
+	robots.userInput()
+//	content.maximumSentences = 7
+//	console.log('Conteúdo inicial:', content)
+	await	robots.text()
+	const content = robots.state.load()
+	console.dir(content, {depth: null } )
+//	console.log(JSON.stringify(content, null, 4))
 //	console.log(content)
 }
 
