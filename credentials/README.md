@@ -1,0 +1,17 @@
+# Credentials format
+
+## Watson Natural Language Understandins
+
+File : `watson-nlu.json`
+
+```
+{
+  "apikey": "r58T-lP7OLAQAa58Lp-jP40kY8qj0Qta92EfNLCwnxZ9",
+  "iam_apikey_description": "Auto-generated for key crn:v1:bluemix:public:natural-language-understanding:us-east:a/55140220274b4b72b28f467685194677:b999703e-c542-4c9e-b0a0-2de2d2852d48:resource-key:989abd1a-18b7-4bdf-ae70-a7642fcf45d6",
+  "iam_apikey_id": "ApiKey-395bdb68-ac21-4f23-9010-ab9048b86e4e",
+  "iam_apikey_name": "Auto-generated service credentials",
+  "iam_role_crn": "crn:v1:bluemix:public:iam::::serviceRole:Manager",
+  "iam_serviceid_crn": "crn:v1:bluemix:public:iam-identity::a/55140220274b4b72b28f467685194677::serviceid:ServiceId-6859d7ee-5b42-4b69-aa17-c3c7409154da",
+  "url": "https://api.us-east.natural-language-understanding.watson.cloud.ibm.com/instances/b999703e-c542-4c9e-b0a0-2de2d2852d48"
+}
+```

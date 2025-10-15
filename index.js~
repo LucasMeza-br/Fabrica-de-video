@@ -5,11 +5,16 @@ const robots = {
 }
 
 async function start() {
-	const content = robots.userInput()
+	let content = {
+		maximumSentences: 7
+	}
+
+	content = robots.userInput()
+	content.maximumSentences = 7
 	console.log(content)
 //await	robots.userInput(content)
 await	robots.text(content)
-
+	console.log(JSON.stringify(content, null, 4))
 	console.log(content)
 }
 
