@@ -82,6 +82,8 @@ credentials/*.json
 
 content.json
 
+content/*.png
+
 # Nuxt.js build / generate output
 .nuxt
 dist
