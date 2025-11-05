@@ -2,7 +2,7 @@ const readline = require('readline-sync')
 const state = require('./state.js')
 function userInput(){
 	const content = {
-	maximumSentences: 7
+	maximumSentences: 15
 	}
 
 	content.searchTerm = askAndReturnSearchTerm()

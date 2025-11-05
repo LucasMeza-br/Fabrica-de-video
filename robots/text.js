@@ -220,17 +220,36 @@ const state = require('./state.js')
 //
 
 async function fetchKeywordsOfAllSentences(content) {
-  for (const sentence of content.sentences) {
+
+   for (let i = content.sentences.length - 1; i>= 0; i--){
+	const sentence = content.sentences[i]
+   	
+//  for (const sentence of content.sentences) {
     try {
       const keywords = await fetchWatsonAndReturnKeywords(sentence.text);
-      sentence.keywords = keywords;
-      console.log(`🔑 Keywords extraídas para: "${sentence.text}" ->`, keywords);
+	
+	    if(keywords && keywords.length >= 3){
+			sentence.keywords = keywords;
+		    console.log(`sentença válida: "${sentence.text}" ->`, keywords);
+
+	    }else {
+			console.log(`sentença descartada: "${sentence.text}"`)
+			content.sentences.splice(i, 1);
+	    }
+
+    
+//      sentence.keywords = keywords;
+//      console.log(`🔑 Keywords extraídas para: "${sentence.text}" ->`, keywords);
     } catch (error) {
       console.error(`❌ Erro ao processar sentença: "${sentence.text}"`, error.message || error);
-      sentence.keywords = [];
+	content.sentences.splice(i, 1);
+
+//	sentence.keywords = [];
     }
   }
+		console.log(`Total de sentenças válidas ${content.sentences.length}`)
 }
+//}
 //
 //		async function fetchWatsonAndReturnKeywords(sentence) {
 //	 	const watsonPromise = new Promise((resolve, reject) => {
@@ -275,7 +294,7 @@ async function fetchWatsonAndReturnKeywords(sentence) {
       text: sentence,
       features: {
         keywords: {
-          limit: 5
+          limit: 10
         }
       }
     });
