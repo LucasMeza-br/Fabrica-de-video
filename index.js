@@ -9,7 +9,7 @@ const robots = {
 async function start() {
 	
 	robots.userInput()
-//	content.maximumSentences = 7
+
 //	console.log('Conteúdo inicial:', content)
 	await robots.text()
 	await robots.image()
